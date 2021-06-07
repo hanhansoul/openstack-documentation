@@ -1,30 +1,36 @@
+# Atoms, tasks and retries
+
 ## Atom
 
 An [`atom`](https://docs.openstack.org/taskflow/latest/user/atoms.html#taskflow.atom.Atom) is the smallest unit in TaskFlow which acts as the base for other classes. Atoms have a name and may have a version. An atom is expected to name desired input values (requirements) and name outputs (provided values).
 
-```
+Atom是TaskFlow中最小的元素单元，是其他类的基类。
+
+```python
 class taskflow.atom.Atom(name=None, 
-                        provides=None, 
-                        requires=None, 
-                        auto_extract=True, 
-                        rebind=None, 
-                        inject=None, 
-                        ignore_list=None, 
-                        revert_rebind=None, 
-                        revert_requires=None)
+                         provides=None, 
+                         requires=None, 
+                         auto_extract=True, 
+                         rebind=None, 
+                         inject=None, 
+                         ignore_list=None, 
+                         revert_rebind=None, 
+                         revert_requires=None)
 ```
 
 An atom is a named object that operates with input data to perform some action that furthers the overall flows progress. It usually also produces some of its own named output as a result of this process.
 
+Atom是一个命名对象，负责接收输入参数，执行逻辑代码，最后返回输出参数。Flow包含若干Atom对象，并通过这种方式实现Flow的运行。
+
 **Parameters**
 
-- **name** – Meaningful name for this atom, should be something that is distinguishable and understandable for notification, debugging, storing and any other similar purposes.
-- **provides** – A set, string or list of items that this will be providing (or could provide) to others, used to correlate and associate the thing/s this atom produces, if it produces anything at all.
-- **inject** – An *immutable* input_name => value dictionary which specifies any initial inputs that should be automatically injected into the atoms scope before the atom execution commences (this allows for providing atom *local*values that do not need to be provided by other atoms/dependents).
+- **name** – Meaningful name for this atom, should be something that is distinguishable and understandable for notification, debugging, storing and any other similar purposes. 
+- **provides** – A set, string or list of items that this will be providing (or could provide) to others, used to correlate and associate the thing/s this atom produces, if it produces anything at all. （指定Atom的`execute()`函数的输出参数名列表）
+- **inject** – An *immutable* input_name => value dictionary which specifies any initial inputs that should be automatically injected into the atoms scope before the atom execution commences (this allows for providing atom *local*values that do not need to be provided by other atoms/dependents). （通过键值对的方式指定在Atom开始执行前需要初始化的输入参数）
 - **rebind** – A dict of key/value pairs used to define argument name conversions for inputs to this atom’s `execute`method.
 - **revert_rebind** – The same as `rebind` but for the `revert`method. If unpassed, `rebind` will be used instead.
-- **requires** – A set or list of required inputs for this atom’s`execute` method.
-- **revert_requires** – A set or list of required inputs for this atom’s `revert` method. If unpassed, `requires` will be used.
+- **requires** – A set or list of required inputs for this atom’s `execute` method. （指定Atom的`execute()`函数的输入参数名列表）
+- **revert_requires** – A set or list of required inputs for this atom’s `revert` method. If unpassed, `requires` will be used. （指定Atom的`revert()`函数的输入参数名列表，若为空则使用`requires`的值）
 
 **Variables**
 
@@ -84,6 +90,8 @@ This method should undo any side-effects caused by previous execution of the ato
 
 A [`task`](https://docs.openstack.org/taskflow/latest/user/atoms.html#taskflow.task.Task) (derived from an atom) is a unit of work that can have an execute & rollback sequence associated with it (they are *nearly* analogous to functions). Your task objects should all derive from [`Task`](https://docs.openstack.org/taskflow/latest/user/atoms.html#taskflow.task.Task) which defines what a task must provide in terms of properties and methods.
 
+Task类是一个抽象类，继承了Atom类，表示一个任务。一个任务包含了执行与回滚逻辑代码。
+
 ![Task outline.](https://docs.openstack.org/taskflow/latest/_images/tasks.png)
 
 Currently the following *provided* types of task subclasses are:
@@ -94,6 +102,8 @@ Currently the following *provided* types of task subclasses are:
 
 
 ## Retry
+
+Retry是一个抽象类，继承了Atom类，表示一个负责处理异常的任务。Retry包含一个`on_failure()`函数，用于确定回滚时采用的策略。
 
 A [`retry`](https://docs.openstack.org/taskflow/latest/user/atoms.html#taskflow.retry.Retry) (derived from an atom) is a special unit of work that handles errors, controls flow execution and can (for example) retry other atoms with other parameters if needed. The goal is that with this consultation the retry atom will suggest a *strategy* for getting around the failure (perhaps by retrying, reverting a single atom, or reverting everything contained in the retries associated [scope](http://en.wikipedia.org/wiki/Scope_(computer_science))).
 
