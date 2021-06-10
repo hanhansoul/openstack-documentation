@@ -6,6 +6,12 @@ To receive these notifications you should register a callback with an instance o
 
 TaskFlow also comes with a set of predefined [listeners](https://docs.openstack.org/taskflow/latest/user/notifications.html#listeners), and provides means to write your own listeners, which can be more convenient than using raw callbacks.
 
+Engine提供了在Task或Flow状态变化接收通知的功能，可用于监控、日志、指标统计及调试。
+
+通过为Engine注册一个`Notifier`实例的回调方法，可实现通知功能。
+
+
+
 ## Receiving notifications with callbacks
 
 ### Flow notifications
@@ -114,3 +120,105 @@ woof
 
 
 ![Inheritance diagram of taskflow.listeners.base.DumpingListener, taskflow.listeners.base.Listener, taskflow.listeners.capturing.CaptureListener, taskflow.listeners.claims.CheckingClaimListener, taskflow.listeners.logging.DynamicLoggingListener, taskflow.listeners.logging.LoggingListener, taskflow.listeners.printing.PrintingListener, taskflow.listeners.timing.PrintingDurationListener, taskflow.listeners.timing.EventTimeListener, taskflow.listeners.timing.DurationListener](https://docs.openstack.org/taskflow/latest/_images/inheritance-3cf6584e8965804e986a5d2b6718af2415e680cb.png)
+
+
+
+### Implementations
+
+#### 日志监听器
+
+```python
+class taskflow.listeners.logging.LoggingListener(engine, 
+                                                 task_listen_for=('*'), 
+                                                 flow_listen_for=('*'), 
+                                                 retry_listen_for=('*'), 
+                                                 log=None, 
+                                                 level=10)
+```
+
+监听Task或Flow的通知，并记录到给定的日志中，默认使用(`taskflow.listeners.logging`日志。
+
+```python
+class taskflow.listeners.logging.DynamicLoggingListener(engine, 
+                                                        task_listen_for=('*'),
+                                                        flow_listen_for=('*'),
+                                                        retry_listen_for=('*'), 
+                                                        log=None, 
+                                                        failure_level=30, 
+                                                        level=10, 
+                                                        hide_inputs_outputs_of=(),
+                                                        fail_formatter=None)
+```
+
+同上。可配置输出日志级别。
+
+```python
+class taskflow.listeners.printing.PrintingListener(engine, 
+                                                   task_listen_for=('*'), 
+                                                   flow_listen_for=('*'), 
+                                                   retry_listen_for=('*'), 
+                                                   stderr=False)
+```
+
+监听Task或Flow通知，将通知信息输出到`stdout`或`stderr`。
+
+#### 时间监听器
+
+```python
+class taskflow.listeners.timing.DurationListener(engine)
+```
+
+监听并返回Task运行时间。
+
+```python
+class taskflow.listeners.timing.PrintingDurationListener(engine, printer=None)
+```
+
+同上。记录并输出Task的运行时间。
+
+```python
+class taskflow.listeners.timing.EventTimeListener(engine, 
+                                                  task_listen_for=('*'), 
+                                                  flow_listen_for=('*'), 
+                                                  retry_listen_for=('*'))
+```
+
+监听Task，Flow和Retry的事件时间戳。
+
+
+
+```python
+lass taskflow.listeners.claims.CheckingClaimListener(engine, 
+                                                     job, 
+                                                     board, 
+                                                     owner, 
+                                                     on_job_loss=None)
+```
+
+
+
+```python
+class taskflow.listeners.capturing.CaptureListener(engine, 
+                                                   task_listen_for=('*'), 
+                                                   flow_listen_for=('*'), 
+                                                   retry_listen_for=('*'), 
+                                                   capture_flow=True, 
+                                                   capture_task=True, 
+                                                   capture_retry=True, 
+                                                   skip_tasks=None, 
+                                                   skip_retries=None, 
+                                                   kip_flows=None, 
+                                                   values=None)
+```
+
+监听并记录状态的变化。主要用于测试。
+
+
+
+#### 格式化器
+
+```python
+class taskflow.formatters.FailureFormatter(engine, hide_inputs_outputs_of=())
+```
+
+格式化返回的失败信息。

@@ -96,3 +96,16 @@ woof
 >>> print(eng.storage.fetch("dog"))
 dog
 ```
+
+
+
+---
+
+
+
+```
+class taskflow.flow.Flow(name, retry=None)
+
+class taskflow.patterns.linear_flow.Flow(name, retry=None)
+```
+

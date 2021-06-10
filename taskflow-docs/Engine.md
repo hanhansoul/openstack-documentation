@@ -131,8 +131,8 @@ taskflow.engines.helpers.run(flow,
 
 ### 作用域解析的默认策略
 
-1. Transient injected atom specific arguments.
-2. Non-transient injected atom specific arguments.
+1. Transient injected atom specific arguments. 
+2. Non-transient injected atom specific arguments. 
 3. Transient injected arguments (flow specific).
 4. Non-transient injected arguments (flow specific).
 5. First scope visited provider that produces the named result; note that if multiple providers are found in the same scope the first (the scope walkers yielded ordering defines what first means) that produced that result and can be extracted without raising an error is selected as the provider of the requested requirement.

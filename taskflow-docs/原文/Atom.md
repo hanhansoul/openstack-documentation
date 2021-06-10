@@ -175,3 +175,71 @@ flow = linear_flow.Flow('send_message',
 ## Hierarchy
 
 ![Inheritance diagram of taskflow.atom, taskflow.task, taskflow.retry.Retry, taskflow.retry.AlwaysRevert, taskflow.retry.AlwaysRevertAll, taskflow.retry.Times, taskflow.retry.ForEach, taskflow.retry.ParameterizedForEach](https://docs.openstack.org/taskflow/latest/_images/inheritance-132045c46dd04436997cbb2633233e2fad13b700.png)
+
+
+
+---
+
+
+
+```python
+# Task的基类
+class taskflow.task.Task(name=None, 
+                         provides=None, 
+                         requires=None, 
+                         auto_extract=True, 
+                         rebind=None, 
+                         inject=None, 
+                         ignore_list=None, 
+                         revert_rebind=None, 
+                         revert_requires=None)
+
+# FunctorTask通过传入一个可执行对象来创建一个Task
+class taskflow.task.FunctorTask(execute, 
+                                name=None, 
+                                provides=None, 
+                                requires=None, 
+                                auto_extract=True, 
+                                rebind=None, 
+                                revert=None, 
+                                version=None, 
+                                inject=None)
+
+# 接收一个方法和一个列表，创建一个Reduce Task
+class taskflow.task.ReduceFunctorTask(functor, 
+                                      requires, 
+                                      name=None, 
+                                      provides=None, 
+                                      auto_extract=True, 
+                                      rebind=None, 
+                                      inject=None)
+
+# 接收一个方法和一个列表，创建一个Map Task
+class taskflow.task.MapFunctorTask(functor, 
+                                   requires, 
+                                   name=None, 
+                                   provides=None, 
+                                   auto_extract=True, 
+                                   rebind=None, 
+                                   inject=None)
+```
+
+
+
+```python
+# Retry基类
+class taskflow.retry.Retry(name=None, 
+                           provides=None, 
+                           requires=None, 
+                           auto_extract=True, 
+                           rebind=None)
+'''
+class taskflow.retry.AlwaysRevert：恢复所有子Flow
+class taskflow.retry.AlwaysRevertAll：
+class taskflow.retry.Times
+class taskflow.retry.ForEach
+class taskflow.retry.ParameterizedForEach
+
+'''
+```
+
